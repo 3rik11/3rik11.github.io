@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Login</title>
+    <link rel="icon" type="image/x-icon" href="icon.png">
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<script>
+function playMusic() {
+    const audio = new Audio("music.mp3");
+    audio.play();
+    audio.onended = function() {
+        alert("RickRolllllllll!");
+    };
+}
+</script>
+<center>
+<header><h2>Login Form</h2></header>
+<p>‎</p>
+<form action="home.html" method="post" onsubmit="return validateForm()"> <!-- Add an onsubmit attribute to the form -->
+    <img src="img_avatar2.png" 
+     width="50" 
+     height="50" />
+     <p>‎</p>
+    <div class="container">
+        <label for="uname"><b>Username</b></label>
+        <input type="text" id="uname" placeholder="Enter username" required> <!-- Add an id and a required attribute to the username input -->
+        <p>‎</p>
+        <p>‎</p>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" id="psw" placeholder="Enter password" required> <!-- Add an id and a required attribute to the password input -->
+        
+            <script>
+                // Define a function to validate the form inputs
+                function validateForm() {
+                    const enteredUname = document.getElementById("uname").value; // Get the value of the username input
+                    const enteredPsw = document.getElementById("psw").value; // Get the value of the password input
+                    const correctUname = "Erik"; // Define the correct username
+                    const correctPsw = "web3.142(###)"; // Define the correct password
+        
+                    if (enteredUname === correctUname && enteredPsw === correctPsw) {
+                        alert("Welcome Back Erik!!") // If both inputs are correct, return true and submit the form
+                    } else {
+                       return true;  // If either input is incorrect, alert the user and prevent the form submission
+                    }
+                }
+            </script>
+        <p>‎</p>
+        <p>‎</p>
+        <button type="submit" href="home.html">Login</button>
+        <p>‎</p>
+        <p>‎</p>
+        <label>
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+        </label>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+        <button type="button" class="cancelbtn" onclick="playMusic()">Cancel</button>
+        <span class="psw">Forgot <a href="#" onclick="playMusic()">password?</a></span>
+    </div>
+</form>
+</center>
+</body>
+</html>
