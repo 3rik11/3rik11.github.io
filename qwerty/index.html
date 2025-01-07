@@ -9,22 +9,7 @@
         .headerdiv {
             background-color: rgb(0, 0, 0);
             padding-bottom: 5;
-            margin-top: 0;
-            margin-bottom: 0;
-            margin-left: 0;
-            margin-right: 0;
-        }
-        
-        .faq,
-        .eg {
-            margin-left: 7;
-            color: white;
-            text-decoration: none;
-        }
-        
-        li,
-        a {
-            display: inline;
+            margin: 0;
         }
         
         nav,
@@ -41,22 +26,42 @@
         nav {
             text-align: center;
             color: white;
+            padding-bottom: 10px;
         }
 
         .header1 {
             margin-top: 0;
             color: white;
-            margin-left: 5;
+            padding-left: 10px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .login,
+        .faq,
+        .eg {
+            margin: 0;
+            display: inline;
+        }
+
+        .faq {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .faq2 {
+            text-decoration: none;
+            color: white;
         }
     </style>
 </head>
-<header>
-    <div class="headerdiv">
+<header class="headerdiv">
+    <div>
         <h1 class="header1">Qwerty Websites!</h1>
         <nav>
-        <li class="login"><a href="login.html">Login</a></li>
-        <li class="faq"><a href="faq.html">Faq</a></li>
-        <li class="eg"><a href="examples.html">Examples</a></li>
+        <p class="login" href="login.html">Login</p>
+        <p class="faq"><a class="faq2" href=faq.html>Faq</a></p>
+        <p class="eg" href="examples.html">Examples</p>
     </nav>
     </div>
 </header>
