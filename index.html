@@ -5,10 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simple Messaging App</title>
   <style>
+    :root {
+      --bg-color: #121212;
+      --header-color: #1e1e1e;
+      --message-bg: #2a2a2a;
+      --text-color: #ffffff;
+      --accent-color: #007acc;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f0f0f0;
+      --header-color: #ffffff;
+      --message-bg: #dcdcdc;
+      --text-color: #000000;
+      --accent-color: #007acc;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background: #121212;
-      color: #fff;
+      background: var(--bg-color);
+      color: var(--text-color);
       margin: 0;
       padding: 0;
       display: flex;
@@ -16,11 +32,23 @@
       height: 100vh;
     }
     header {
-      background: #1e1e1e;
+      background: var(--header-color);
       padding: 1rem;
       text-align: center;
       font-size: 1.5rem;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .theme-toggle, .clear-btn {
+      background: none;
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 0.5rem;
     }
     .messages {
       flex-grow: 1;
@@ -30,52 +58,67 @@
       flex-direction: column;
     }
     .message {
-      background: #2a2a2a;
+      background: var(--message-bg);
       padding: 0.75rem 1rem;
       margin-bottom: 0.5rem;
       border-radius: 10px;
       max-width: 60%;
     }
+    .message .username {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
     .input-area {
       display: flex;
       padding: 1rem;
-      background: #1e1e1e;
+      background: var(--header-color);
+      gap: 0.5rem;
     }
-    .input-area input {
-      flex-grow: 1;
+    .input-area input, .input-area button {
+      border-radius: 10px;
       padding: 0.75rem;
       border: none;
-      border-radius: 10px;
-      margin-right: 0.5rem;
+    }
+    .input-area input[type="text"] {
+      flex-grow: 1;
     }
     .input-area button {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      background: #007acc;
+      background: var(--accent-color);
       color: white;
       cursor: pointer;
+    }
+    #usernameInput {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <header>Messaging App</header>
+  <header>
+    Messaging App
+    <div>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+      <button class="clear-btn" onclick="clearMessages()">Clear Chat</button>
+    </div>
+  </header>
   <div class="messages" id="messageList"></div>
   <div class="input-area">
+    <input type="text" id="usernameInput" placeholder="Username" style="width: 120px;">
     <input type="text" id="messageInput" placeholder="Type a message...">
     <button onclick="sendMessage()">Send</button>
   </div>
   <script>
     const messageList = document.getElementById('messageList');
     const messageInput = document.getElementById('messageInput');
+    const usernameInput = document.getElementById('usernameInput');
 
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages')) || [];
       messageList.innerHTML = '';
-      messages.forEach(text => {
+      messages.forEach(({ user, text }) => {
         const msg = document.createElement('div');
         msg.className = 'message';
-        msg.textContent = text;
+        msg.innerHTML = `<span class="username">${user}</span>${text}`;
         messageList.appendChild(msg);
       });
       messageList.scrollTop = messageList.scrollHeight;
@@ -83,15 +126,53 @@
 
     function sendMessage() {
       const text = messageInput.value.trim();
+      const user = localStorage.getItem('username') || 'Anonymous';
       if (!text) return;
       const messages = JSON.parse(localStorage.getItem('messages')) || [];
-      messages.push(text);
+      messages.push({ user, text });
       localStorage.setItem('messages', JSON.stringify(messages));
       messageInput.value = '';
       loadMessages();
     }
 
-    window.onload = loadMessages;
+    function clearMessages() {
+      localStorage.removeItem('messages');
+      loadMessages();
+    }
+
+    messageInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+
+    function askUsername() {
+      let name = prompt("Please enter your username:");
+      while (!name) {
+        name = prompt("Username cannot be empty. Please enter your username:");
+      }
+      localStorage.setItem('username', name);
+    }
+
+    window.onload = function () {
+      applySavedTheme();
+      if (!localStorage.getItem('username')) askUsername();
+      usernameInput.value = localStorage.getItem('username');
+      usernameInput.style.display = 'none';
+      loadMessages();
+    };
   </script>
 </body>
 </html>
