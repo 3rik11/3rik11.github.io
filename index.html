@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Discord-like Messaging App - Advanced</title>
+  <title>Discord-like Messaging App - Fixed Layout</title>
   <style>
     :root {
       --bg-dark: #18191c;
@@ -44,6 +44,7 @@
       height: 100vh;
       overflow: hidden;
       user-select: none;
+      min-width: 320px;
     }
     /* Scrollbar styling */
     ::-webkit-scrollbar {
@@ -65,28 +66,66 @@
       display: flex;
       flex-direction: column;
       border-right: 1px solid #222;
+      min-width: 260px;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #topBar {
+      padding: 0.75rem 1rem;
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    #topBar > div {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
+      user-select: text;
+    }
+    #themeToggle {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+    #themeToggle:active {
+      background: #4752c4;
     }
     #sidebar h2 {
-      font-size: 1.2rem;
-      padding: 1rem;
+      font-size: 1.1rem;
+      padding: 0.75rem 1rem 0.5rem;
       margin: 0;
       border-bottom: 1px solid #222;
       user-select: text;
+      flex-shrink: 0;
     }
     #channels, #dmList {
       flex-grow: 1;
       overflow-y: auto;
       padding: 0.5rem 0;
+      user-select: none;
     }
     .channel, .dm-user {
       padding: 0.5rem 1rem;
       cursor: pointer;
       border-radius: 4px;
-      margin: 0 0.5rem;
+      margin: 0 0.5rem 0.25rem 0.5rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       user-select: none;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .channel:hover, .dm-user:hover {
       background: var(--bg-channel-list);
@@ -96,10 +135,24 @@
       color: white;
       font-weight: bold;
     }
-    .channel:before {
+    .channel::before {
       content: '#';
       margin-right: 5px;
       color: var(--accent);
+      user-select: none;
+    }
+    #userDisplay {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      padding-left: 1rem;
+      user-select: text;
+      border-top: 1px solid #222;
+      padding-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Main area */
@@ -108,6 +161,8 @@
       display: flex;
       flex-direction: column;
       background: var(--bg-message);
+      height: 100vh;
+      overflow: hidden;
     }
     #chatHeader {
       padding: 1rem;
@@ -115,6 +170,8 @@
       font-weight: bold;
       font-size: 1.25rem;
       user-select: text;
+      flex-shrink: 0;
+      background: var(--bg-message);
     }
     #messages {
       flex-grow: 1;
@@ -122,6 +179,7 @@
       overflow-y: auto;
       scroll-behavior: smooth;
       user-select: text;
+      background: var(--bg-message);
     }
     .message {
       margin-bottom: 1rem;
@@ -140,10 +198,12 @@
       font-weight: 700;
       margin-bottom: 0.25rem;
       color: var(--accent);
+      user-select: text;
     }
     .message.own {
       background: #5865f2;
       color: white;
+      align-self: flex-end;
     }
     .message.own:hover {
       background: #4752c4;
@@ -189,6 +249,7 @@
       display: flex;
       gap: 0.5rem;
       border-top: 1px solid #222;
+      flex-shrink: 0;
     }
     #messageInput {
       flex-grow: 1;
@@ -200,6 +261,8 @@
       resize: none;
       height: 40px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: inherit;
+      background: var(--bg-message);
     }
     #messageInput:focus {
       outline: 2px solid var(--accent);
@@ -214,61 +277,334 @@
       cursor: pointer;
       padding: 0 1.25rem;
       user-select: none;
+      flex-shrink: 0;
     }
     #sendBtn:active {
       background: #4752c4;
     }
-
-    /* Top bar with theme toggle */
-    #topBar {
-      padding: 0.75rem 1rem;
-      background: var(--bg-sidebar);
-      border-bottom: 1px solid #222;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      user-select: none;
-    }
-    #themeToggle {
-      background: var(--accent);
-      border: none;
-      color: white;
-      padding: 0.4rem 0.8rem;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-    #themeToggle:active {
-      background: #4752c4;
-    }
-
-    /* Username display */
-    #userDisplay {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      padding-left: 1rem;
-      user-select: text;
-      border-top: 1px solid #222;
-      padding-top: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
   </style>
 </head>
 <body>
-  <div id="sidebar">
+  <div id="sidebar" role="navigation" aria-label="Sidebar with channels and direct messages">
     <div id="topBar">
       <div>Channels</div>
       <button id="themeToggle" aria-label="Toggle theme">Toggle Theme</button>
     </div>
     <h2>Main Server</h2>
-    <div id="channels" role="list"></div>
+    <div id="channels" role="list" tabindex="0"></div>
     <h2>Direct Messages</h2>
-    <div id="dmList" role="list"></div>
+    <div id="dmList" role="list" tabindex="0"></div>
     <div id="userDisplay" aria-live="polite"></div>
   </div>
-  <div id="main">
+  <div id="main" role="main">
     <div id="chatHeader" aria-live="polite">#general</div>
     <div id="messages" role="log" aria-live="polite" tabindex="0"></div>
     <form id="inputArea" aria-label="Message input form">
-      <textarea id="messageInput" placeholder="Message #general" autocomplete="off" rows
+      <textarea id="messageInput" placeholder="Message #general" autocomplete="off" rows="1" aria-label="Message input"></textarea>
+      <button id="sendBtn" type="submit" aria-label="Send message">Send</button>
+    </form>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_PREFIX = 'discord_clone_';
+
+      // Elements
+      const channelsDiv = document.getElementById('channels');
+      const dmListDiv = document.getElementById('dmList');
+      const messagesDiv = document.getElementById('messages');
+      const chatHeader =
+
+
+
+
+
+ChatGPT said:
+document.getElementById('chatHeader');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const themeToggle = document.getElementById('themeToggle');
+const userDisplay = document.getElementById('userDisplay');
+
+javascript
+Copy
+Edit
+  // State
+  let username = '';
+  let theme = 'dark';
+  let currentChat = { type: 'channel', id: 'general' };
+  let editingMessageId = null;
+
+  // Channels and DMs - example data
+  const channels = ['general', 'random', 'projects'];
+  const dmUsers = ['Alice', 'Bob', 'Charlie'];
+
+  // Username functions
+  function loadUsername() {
+    return localStorage.getItem(STORAGE_PREFIX + 'username');
+  }
+  function saveUsername(name) {
+    localStorage.setItem(STORAGE_PREFIX + 'username', name);
+  }
+  function askUsername() {
+    let name = prompt('Enter your username:');
+    while (!name || !name.trim()) {
+      name = prompt('Username cannot be empty. Enter your username:');
+    }
+    name = name.trim();
+    saveUsername(name);
+    return name;
+  }
+
+  // Theme functions
+  function loadTheme() {
+    return localStorage.getItem(STORAGE_PREFIX + 'theme') || 'dark';
+  }
+  function saveTheme(t) {
+    localStorage.setItem(STORAGE_PREFIX + 'theme', t);
+  }
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
+  }
+  function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    applyTheme(theme);
+    saveTheme(theme);
+  }
+
+  // Storage keys
+  function storageKey(chat) {
+    return chat.type === 'channel' ? STORAGE_PREFIX + 'channel_' + chat.id : STORAGE_PREFIX + 'dm_' + chat.id;
+  }
+
+  // Load/save messages
+  function loadMessages(chat) {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey(chat))) || [];
+    } catch {
+      return [];
+    }
+  }
+  function saveMessages(chat, messages) {
+    localStorage.setItem(storageKey(chat), JSON.stringify(messages));
+  }
+
+  // Render channels
+  function renderChannels() {
+    channelsDiv.innerHTML = '';
+    channels.forEach(channel => {
+      const div = document.createElement('div');
+      div.textContent = channel;
+      div.className = 'channel';
+      if (currentChat.type === 'channel' && currentChat.id === channel) {
+        div.classList.add('active');
+      }
+      div.tabIndex = 0;
+      div.setAttribute('role', 'listitem');
+      div.addEventListener('click', () => switchChat({ type: 'channel', id: channel }));
+      div.addEventListener('keydown', e => {
+        if (e.key === 'Enter') switchChat({ type: 'channel', id: channel });
+      });
+      channelsDiv.appendChild(div);
+    });
+  }
+  // Render DMs
+  function renderDMs() {
+    dmListDiv.innerHTML = '';
+    dmUsers.forEach(dm => {
+      const div = document.createElement('div');
+      div.textContent = dm;
+      div.className = 'dm-user';
+      if (currentChat.type === 'dm' && currentChat.id === dm) {
+        div.classList.add('active');
+      }
+      div.tabIndex = 0;
+      div.setAttribute('role', 'listitem');
+      div.addEventListener('click', () => switchChat({ type: 'dm', id: dm }));
+      div.addEventListener('keydown', e => {
+        if (e.key === 'Enter') switchChat({ type: 'dm', id: dm });
+      });
+      dmListDiv.appendChild(div);
+    });
+  }
+
+  // Switch chat
+  function switchChat(chat) {
+    if (editingMessageId !== null) cancelEditing();
+    currentChat = chat;
+    renderChannels();
+    renderDMs();
+    renderMessages();
+    updateHeader();
+    updateInputPlaceholder();
+  }
+
+  // Update header
+  function updateHeader() {
+    if (currentChat.type === 'channel') {
+      chatHeader.textContent = '#' + currentChat.id;
+    } else {
+      chatHeader.textContent = currentChat.id;
+    }
+  }
+  // Input placeholder
+  function updateInputPlaceholder() {
+    if (currentChat.type === 'channel') {
+      messageInput.placeholder = `Message #${currentChat.id}`;
+    } else {
+      messageInput.placeholder = `Message @${currentChat.id}`;
+    }
+  }
+
+  // Render messages
+  function renderMessages() {
+    const messages = loadMessages(currentChat);
+    messagesDiv.innerHTML = '';
+    messages.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message');
+      if (msg.user === username) msgDiv.classList.add('own');
+      msgDiv.dataset.id = msg.id;
+
+      const userSpan = document.createElement('span');
+      userSpan.className = 'user';
+      userSpan.textContent = msg.user;
+      msgDiv.appendChild(userSpan);
+
+      if (editingMessageId === msg.id) {
+        msgDiv.classList.add('editing');
+        const textarea = document.createElement('textarea');
+        textarea.value = msg.text;
+        textarea.rows = 2;
+        msgDiv.appendChild(textarea);
+        textarea.focus();
+
+        textarea.addEventListener('keydown', e => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            finishEditing(msg.id, textarea.value.trim());
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEditing();
+          }
+        });
+      } else {
+        const textNode = document.createTextNode(msg.text);
+        msgDiv.appendChild(textNode);
+      }
+
+      if (msg.user === username && editingMessageId === null) {
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.title = 'Delete message';
+        delBtn.innerHTML = '🗑️';
+        delBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          deleteMessage(msg.id);
+        });
+        msgDiv.appendChild(delBtn);
+      }
+
+      if (msg.user === username && editingMessageId === null) {
+        msgDiv.style.cursor = 'pointer';
+        msgDiv.addEventListener('click', () => startEditing(msg.id));
+      }
+
+      messagesDiv.appendChild(msgDiv);
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // Add message
+  function addMessage(text) {
+    if (!text.trim()) return;
+    if (editingMessageId !== null) {
+      finishEditing(editingMessageId, text.trim());
+      return;
+    }
+    const messages = loadMessages(currentChat);
+    const newMsg = {
+      id: Date.now() + '_' + Math.random().toString(36).slice(2,8),
+      user: username,
+      text: text.trim(),
+      timestamp: Date.now()
+    };
+    messages.push(newMsg);
+    saveMessages(currentChat, messages);
+    renderMessages();
+  }
+
+  // Delete message
+  function deleteMessage(id) {
+    if (!confirm('Delete this message?')) return;
+    const messages = loadMessages(currentChat);
+    const filtered = messages.filter(m => m.id !== id);
+    saveMessages(currentChat, filtered);
+    renderMessages();
+  }
+
+  // Edit message
+  function startEditing(id) {
+    editingMessageId = id;
+    renderMessages();
+  }
+  function finishEditing(id, newText) {
+    if (!newText) {
+      deleteMessage(id);
+      editingMessageId = null;
+      return;
+    }
+    const messages = loadMessages(currentChat);
+    const msgIndex = messages.findIndex(m => m.id === id);
+    if (msgIndex >= 0) {
+      messages[msgIndex].text = newText;
+      messages[msgIndex].timestamp = Date.now();
+      saveMessages(currentChat, messages);
+    }
+    editingMessageId = null;
+    renderMessages();
+  }
+  function cancelEditing() {
+    editingMessageId = null;
+    renderMessages();
+  }
+
+  // Initialization
+  function init() {
+    username = loadUsername() || askUsername();
+    userDisplay.textContent = `Logged in as: ${username}`;
+    theme = loadTheme();
+    applyTheme(theme);
+    renderChannels();
+    renderDMs();
+    renderMessages();
+    updateHeader();
+    updateInputPlaceholder();
+  }
+
+  // Event listeners
+  sendBtn.addEventListener('click', e => {
+    e.preventDefault();
+    addMessage(messageInput.value);
+    messageInput.value = '';
+    messageInput.focus();
+  });
+  messageInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+  themeToggle.addEventListener('click', () => {
+    toggleTheme();
+  });
+
+  // Poll to sync messages every 2 seconds (simulate realtime)
+  setInterval(() => {
+    renderMessages();
+  }, 2000);
+
+  init();
+})();
+</script> </body> </html>
