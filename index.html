@@ -1,178 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Messaging App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Discord-like Messaging App - Advanced</title>
   <style>
     :root {
-      --bg-color: #121212;
-      --header-color: #1e1e1e;
-      --message-bg: #2a2a2a;
-      --text-color: #ffffff;
-      --accent-color: #007acc;
+      --bg-dark: #18191c;
+      --bg-sidebar: #2f3136;
+      --bg-channel-list: #202225;
+      --bg-message: #36393f;
+      --text-primary: #dcddde;
+      --text-secondary: #72767d;
+      --accent: #5865f2;
+      --scrollbar-bg: #202225;
+      --scrollbar-thumb: #5865f2;
+      --edit-bg: #40444b;
+      --edit-border: #5865f2;
     }
-
     [data-theme="light"] {
-      --bg-color: #f0f0f0;
-      --header-color: #ffffff;
-      --message-bg: #dcdcdc;
-      --text-color: #000000;
-      --accent-color: #007acc;
+      --bg-dark: #f2f3f5;
+      --bg-sidebar: #e3e5e8;
+      --bg-channel-list: #d7dadc;
+      --bg-message: #fff;
+      --text-primary: #2f3136;
+      --text-secondary: #72767d;
+      --accent: #5865f2;
+      --scrollbar-bg: #d7dadc;
+      --scrollbar-thumb: #5865f2;
+      --edit-bg: #e6e6e6;
+      --edit-border: #5865f2;
     }
 
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 10px;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      border-right: 1px solid #222;
     }
-    header {
-      background: var(--header-color);
+    #sidebar h2 {
+      font-size: 1.2rem;
       padding: 1rem;
-      text-align: center;
-      font-size: 1.5rem;
+      margin: 0;
+      border-bottom: 1px solid #222;
+      user-select: text;
+    }
+    #channels, #dmList {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+    }
+    .channel, .dm-user {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      user-select: none;
+    }
+    .channel:hover, .dm-user:hover {
+      background: var(--bg-channel-list);
+    }
+    .channel.active, .dm-user.active {
+      background: var(--accent);
+      color: white;
       font-weight: bold;
+    }
+    .channel:before {
+      content: '#';
+      margin-right: 5px;
+      color: var(--accent);
+    }
+
+    /* Main area */
+    #main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-message);
+    }
+    #chatHeader {
+      padding: 1rem;
+      border-bottom: 1px solid #222;
+      font-weight: bold;
+      font-size: 1.25rem;
+      user-select: text;
+    }
+    #messages {
+      flex-grow: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      user-select: text;
+    }
+    .message {
+      margin-bottom: 1rem;
+      max-width: 70%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      background: #40444b;
+      color: var(--text-primary);
+      user-select: text;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .message .user {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--accent);
+    }
+    .message.own {
+      background: #5865f2;
+      color: white;
+    }
+    .message.own:hover {
+      background: #4752c4;
+    }
+    .message .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 14px;
+      color: #ff5c5c;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: none;
+      user-select: none;
+    }
+    .message.own:hover .delete-btn {
+      display: block;
+    }
+    .message.editing {
+      background: var(--edit-bg);
+      border: 2px solid var(--edit-border);
+      padding: 0.25rem 0.5rem;
+    }
+    .message.editing textarea {
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 0.25rem 0.4rem;
+      background: transparent;
+      color: inherit;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    /* Input area */
+    #inputArea {
+      padding: 0.75rem 1rem;
+      background: var(--bg-channel-list);
+      display: flex;
+      gap: 0.5rem;
+      border-top: 1px solid #222;
+    }
+    #messageInput {
+      flex-grow: 1;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      outline-offset: -2px;
+      resize: none;
+      height: 40px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #messageInput:focus {
+      outline: 2px solid var(--accent);
+    }
+    #sendBtn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 0 1.25rem;
+      user-select: none;
+    }
+    #sendBtn:active {
+      background: #4752c4;
+    }
+
+    /* Top bar with theme toggle */
+    #topBar {
+      padding: 0.75rem 1rem;
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid #222;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
     }
-    .theme-toggle, .clear-btn {
-      background: none;
-      border: 1px solid var(--accent-color);
-      color: var(--accent-color);
-      padding: 0.3rem 0.6rem;
+    #themeToggle {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.4rem 0.8rem;
       border-radius: 5px;
       cursor: pointer;
-      margin-left: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
-    .messages {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
+    #themeToggle:active {
+      background: #4752c4;
     }
-    .message {
-      background: var(--message-bg);
-      padding: 0.75rem 1rem;
+
+    /* Username display */
+    #userDisplay {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      padding-left: 1rem;
+      user-select: text;
+      border-top: 1px solid #222;
+      padding-top: 0.5rem;
       margin-bottom: 0.5rem;
-      border-radius: 10px;
-      max-width: 60%;
-    }
-    .message .username {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 0.3rem;
-    }
-    .input-area {
-      display: flex;
-      padding: 1rem;
-      background: var(--header-color);
-      gap: 0.5rem;
-    }
-    .input-area input, .input-area button {
-      border-radius: 10px;
-      padding: 0.75rem;
-      border: none;
-    }
-    .input-area input[type="text"] {
-      flex-grow: 1;
-    }
-    .input-area button {
-      background: var(--accent-color);
-      color: white;
-      cursor: pointer;
-    }
-    #usernameInput {
-      display: none;
     }
   </style>
 </head>
 <body>
-  <header>
-    Messaging App
-    <div>
-      <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
-      <button class="clear-btn" onclick="clearMessages()">Clear Chat</button>
+  <div id="sidebar">
+    <div id="topBar">
+      <div>Channels</div>
+      <button id="themeToggle" aria-label="Toggle theme">Toggle Theme</button>
     </div>
-  </header>
-  <div class="messages" id="messageList"></div>
-  <div class="input-area">
-    <input type="text" id="usernameInput" placeholder="Username" style="width: 120px;">
-    <input type="text" id="messageInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
+    <h2>Main Server</h2>
+    <div id="channels" role="list"></div>
+    <h2>Direct Messages</h2>
+    <div id="dmList" role="list"></div>
+    <div id="userDisplay" aria-live="polite"></div>
   </div>
-  <script>
-    const messageList = document.getElementById('messageList');
-    const messageInput = document.getElementById('messageInput');
-    const usernameInput = document.getElementById('usernameInput');
-
-    function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages')) || [];
-      messageList.innerHTML = '';
-      messages.forEach(({ user, text }) => {
-        const msg = document.createElement('div');
-        msg.className = 'message';
-        msg.innerHTML = `<span class="username">${user}</span>${text}`;
-        messageList.appendChild(msg);
-      });
-      messageList.scrollTop = messageList.scrollHeight;
-    }
-
-    function sendMessage() {
-      const text = messageInput.value.trim();
-      const user = localStorage.getItem('username') || 'Anonymous';
-      if (!text) return;
-      const messages = JSON.parse(localStorage.getItem('messages')) || [];
-      messages.push({ user, text });
-      localStorage.setItem('messages', JSON.stringify(messages));
-      messageInput.value = '';
-      loadMessages();
-    }
-
-    function clearMessages() {
-      localStorage.removeItem('messages');
-      loadMessages();
-    }
-
-    messageInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-
-    function applySavedTheme() {
-      const saved = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', saved);
-    }
-
-    function askUsername() {
-      let name = prompt("Please enter your username:");
-      while (!name) {
-        name = prompt("Username cannot be empty. Please enter your username:");
-      }
-      localStorage.setItem('username', name);
-    }
-
-    window.onload = function () {
-      applySavedTheme();
-      if (!localStorage.getItem('username')) askUsername();
-      usernameInput.value = localStorage.getItem('username');
-      usernameInput.style.display = 'none';
-      loadMessages();
-    };
-  </script>
-</body>
-</html>
+  <div id="main">
+    <div id="chatHeader" aria-live="polite">#general</div>
+    <div id="messages" role="log" aria-live="polite" tabindex="0"></div>
+    <form id="inputArea" aria-label="Message input form">
+      <textarea id="messageInput" placeholder="Message #general" autocomplete="off" rows
