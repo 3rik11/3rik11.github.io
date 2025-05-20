@@ -1,17 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>3rik11.github.io</title>
-    <header>
-        <h1>3rik11.github.io</h1>
-        <nav>
-            <li class=nav"><a href="qwerty/index">Qwerty</a></li>
-        <li class="nav"><a href="suits/">Suits</a></li>
-        <li class="nav"><a href="snakesite/">Snake</a></li>
-        <li class="nav"><a href="nova/">NOVA</a></li>
-    </nav>
-        </nav>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Messaging App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #1e1e1e;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      background: #2a2a2a;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 10px;
+      max-width: 60%;
+    }
+    .input-area {
+      display: flex;
+      padding: 1rem;
+      background: #1e1e1e;
+    }
+    .input-area input {
+      flex-grow: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 10px;
+      margin-right: 0.5rem;
+    }
+    .input-area button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      background: #007acc;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>Messaging App</header>
+  <div class="messages" id="messageList"></div>
+  <div class="input-area">
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <script>
+    const messageList = document.getElementById('messageList');
+    const messageInput = document.getElementById('messageInput');
+
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('messages')) || [];
+      messageList.innerHTML = '';
+      messages.forEach(text => {
+        const msg = document.createElement('div');
+        msg.className = 'message';
+        msg.textContent = text;
+        messageList.appendChild(msg);
+      });
+      messageList.scrollTop = messageList.scrollHeight;
+    }
+
+    function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+      const messages = JSON.parse(localStorage.getItem('messages')) || [];
+      messages.push(text);
+      localStorage.setItem('messages', JSON.stringify(messages));
+      messageInput.value = '';
+      loadMessages();
+    }
+
+    window.onload = loadMessages;
+  </script>
+</body>
 </html>
