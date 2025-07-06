@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oliver! JR. Songs</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f7f7f7;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2d5c88;
+        }
+        p {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        #searchInput {
+            display: block;
+            margin: 1.5em auto 2em auto;
+            padding: 0.5em 1em;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        ul#songList {
+            list-style: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 0 auto 2em auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44, 92, 136, 0.08);
+        }
+        ul#songList li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1em;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s;
+        }
+        ul#songList li:last-child {
+            border-bottom: none;
+        }
+        ul#songList li:hover {
+            background: #f0f8ff;
+        }
+        audio {
+            margin-left: 1em;
+            flex-shrink: 0;
+        }
+        a {
+            color: #2d5c88;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover {
+            color: #1a3a5b;
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            ul#songList {
+                max-width: 98%;
+            }
+            ul#songList li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            audio {
+                margin: 0.5em 0 0 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Oliver! JR. Songs</h1>
+    <p>Welcome to the songs section for "Oliver! JR." Here you will find a list of songs featured in the musical.</p>
+
+    <h2>List of Performance Songs</h2>
+    <input type="text" id="searchInput" placeholder="Search for a song..." onkeyup="filterSongs()">
+
+    <ul id="songList">
+    <li>Prologue
+        <audio controls src="perf/01_Prologue.wav"></audio>
+    </li>
+    <li>Food Glorious Food
+        <audio controls src="perf/02_Food Glorious Food.wav"></audio>
+    </li>
+    <li>Incidental Music Into Oliver (Part 1)
+        <audio controls src="perf/03_Incidental Music Into Oliver (Part 1).wav"></audio>
+    </li>
+    <li>Incidental Music Into Oliver (Part 2)
+        <audio controls src="perf/04_Incidental Music Into Oliver (Part 2).wav"></audio>
+    </li>
+    <li>Oliver
+        <audio controls src="perf/05_Oliver.wav"></audio>
+    </li>
+    <li>Scurry Music
+        <audio controls src="perf/06_Scurry Music.wav"></audio>
+    </li>
+    <li>Boy For Sale
+        <audio controls src="perf/07_Boy For Sale.wav"></audio>
+    </li>
+    <li>Where Is Love
+        <audio controls src="perf/08_Where Is Love.wav"></audio>
+    </li>
+    <li>Next Morning
+        <audio controls src="perf/09_Next Morning.wav"></audio>
+    </li>
+    <li>The Fight
+        <audio controls src="perf/10_The Fight.wav"></audio>
+    </li>
+    <li>Oliver's Escape
+        <audio controls src="perf/11_Oliver's Escape.wav"></audio>
+    </li>
+    <li>Consider Yourself
+        <audio controls src="perf/12_Consider Yourself.wav"></audio>
+    </li>
+    <li>Consider Yourself (Playoff)
+        <audio controls src="perf/13_Consider Yourself (Playoff).wav"></audio>
+    </li>
+    <li>Pick A Pocket Or Two
+        <audio controls src="perf/14_Pick A Pocket Or Two.wav"></audio>
+    </li>
+    <li>Rum-Tum-Tum
+        <audio controls src="perf/15_Rum-Tum-Tum.wav"></audio>
+    </li>
+    <li>Intermezzo
+        <audio controls src="perf/16_Intermezzo.wav"></audio>
+    </li>
+    <li>It's A Fine Life
+        <audio controls src="perf/17_It's A Fine Life.wav"></audio>
+    </li>
+    <li>I'd Do Anything
+        <audio controls src="perf/18_I'd Do Anything.wav"></audio>
+    </li>
+    <li>Be Back Soon
+        <audio controls src="perf/19_Be Back Soon.wav"></audio>
+    </li>
+    <li>The Robbery / Chaos / The Chase
+        <audio controls src="perf/20_The RobberyChaosThe Chase.wav"></audio>
+    </li>
+    <li>Bill Sikes Cross
+        <audio controls src="perf/21_Bill Sikes Cross.wav"></audio>
+    </li>
+    <li>Oom-Pah-Pah
+        <audio controls src="perf/22_Oom-Pah-Pah.wav"></audio>
+    </li>
+    <li>My Name
+        <audio controls src="perf/23_My Name.wav"></audio>
+    </li>
+    <li>As Long As He Needs Me
+        <audio controls src="perf/24_As Long As He Needs Me.wav"></audio>
+    </li>
+    <li>Where Is Love (Reprise)
+        <audio controls src="perf/25_Where Is Love (Reprise).wav"></audio>
+    </li>
+    <li>Who Will Buy (Part 1)
+        <audio controls src="perf/26_Who Will Buy (Part 1).wav"></audio>
+    </li>
+    <li>Portrait Music
+        <audio controls src="perf/27_Portrait Music.wav"></audio>
+    </li>
+    <li>Who Will Buy (Part 2)
+        <audio controls src="perf/28_Who Will Buy (Part 2).wav"></audio>
+    </li>
+    <li>Recapture
+        <audio controls src="perf/29_Recapture.wav"></audio>
+    </li>
+    <li>It's A Fine Life (Reprise)
+        <audio controls src="perf/30_It's A Fine Life (Reprise).wav"></audio>
+    </li>
+    <li>Reviewing The Situation
+        <audio controls src="perf/31_Reviewing The Situation.wav"></audio>
+    </li>
+    <li>Back To The Workhouse
+        <audio controls src="perf/32_Back To The Workhouse.wav"></audio>
+    </li>
+    <li>Old Sally
+        <audio controls src="perf/33_Old Sally.wav"></audio>
+    </li>
+    <li>Oliver (Reprise)
+        <audio controls src="perf/34_Oliver (Reprise).wav"></audio>
+    </li>
+    <li>The Locket
+        <audio controls src="perf/35_The Locket.wav"></audio>
+    </li>
+    <li>As Long As He Needs Me (Reprise)
+        <audio controls src="perf/36_As Long As He Needs Me (Reprise).wav"></audio>
+    </li>
+    <li>London Bridge
+        <audio controls src="perf/37_London Bridge.wav"></audio>
+    </li>
+    <li>Bows
+        <audio controls src="perf/38_Bows.wav"></audio>
+    </li>
+    <li>Playout
+        <audio controls src="perf/39_Playout.wav"></audio>
+    </li>
+</ul>
+
+
+    <p>For more information and resources, visit the <a href="index.html">main page</a>.</p>
+
+    <script>
+    function filterSongs() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const ul = document.getElementById('songList');
+        const li = ul.getElementsByTagName('li');
+
+        for (let i = 0; i < li.length; i++) {
+            const txtValue = li[i].textContent || li[i].innerText;
+            li[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
+        }
+    }
+    </script>
+</body>
+</html>
