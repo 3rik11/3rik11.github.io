@@ -80,6 +80,21 @@
                 width: 100%;
             }
         }
+        #nowPlaying {
+            position: fixed;
+            right: 1.5em;
+            bottom: 1.5em;
+            background: #2d5c88;
+            color: #fff;
+            padding: 0.7em 1.2em;
+            border-radius: 1.5em;
+            box-shadow: 0 2px 8px rgba(44, 92, 136, 0.18);
+            font-size: 1.1em;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            opacity: 0.95;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +103,19 @@
 
     <h2>List of Performance Songs</h2>
     <input type="text" id="searchInput" placeholder="Search for a song..." onkeyup="filterSongs()">
+
+    <div style="text-align:center; margin-bottom:1em;">
+        <label for="autoplayCount">How many songs to autoplay?</label>
+        <input type="number" id="autoplayCount" min="1" max="39" value="3" style="width:3em;">
+        <button onclick="autoplaySongs()">Autoplay</button>
+    </div>
+
+    <div style="text-align:center; margin-bottom:1em;">
+        <label>
+            <input type="checkbox" id="toggleDir" onchange="toggleDirectory()">
+            Use rehearsal tracks
+        </label>
+    </div>
 
     <ul id="songList">
     <li>Prologue
@@ -209,21 +237,117 @@
     </li>
 </ul>
 
+    <div id="nowPlaying"></div>
 
     <p>For more information and resources, visit the <a href="index.html">main page</a>.</p>
 
     <script>
-    function filterSongs() {
-        const input = document.getElementById('searchInput');
-        const filter = input.value.toLowerCase();
-        const ul = document.getElementById('songList');
-        const li = ul.getElementsByTagName('li');
+function filterSongs() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const ul = document.getElementById('songList');
+    const li = ul.getElementsByTagName('li');
 
-        for (let i = 0; i < li.length; i++) {
-            const txtValue = li[i].textContent || li[i].innerText;
-            li[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
+    for (let i = 0; i < li.length; i++) {
+        const txtValue = li[i].textContent || li[i].innerText;
+        li[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
+    }
+}
+
+// Show now playing
+function setNowPlaying(songName) {
+    const nowPlayingDiv = document.getElementById('nowPlaying');
+    if (songName) {
+        nowPlayingDiv.textContent = 'Now Playing: ' + songName;
+        nowPlayingDiv.style.display = 'block';
+    } else {
+        nowPlayingDiv.textContent = '';
+        nowPlayingDiv.style.display = 'none';
+    }
+}
+
+// Pause all other audios before playing a new one
+function pauseAllExcept(currentAudio) {
+    document.querySelectorAll('#songList audio').forEach(audio => {
+        if (audio !== currentAudio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
+}
+
+// Autoplay logic
+function autoplaySongs() {
+    const count = parseInt(document.getElementById('autoplayCount').value, 10);
+    const lis = Array.from(document.querySelectorAll('#songList li')).filter(li => li.style.display !== 'none');
+    if (lis.length === 0) return;
+
+    // Pause all audios first
+    document.querySelectorAll('#songList audio').forEach(a => { a.pause(); a.currentTime = 0; });
+
+    let current = 0;
+    function playNext() {
+        if (current >= Math.min(count, lis.length)) {
+            setNowPlaying('');
+            return;
+        }
+        const audio = lis[current].querySelector('audio');
+        const songName = lis[current].childNodes[0].textContent.trim();
+        if (audio) {
+            setNowPlaying(songName);
+            pauseAllExcept(audio);
+            audio.play();
+            audio.onended = function() {
+                current++;
+                playNext();
+            };
+        } else {
+            setNowPlaying('');
         }
     }
+    playNext();
+}
+
+// Listen for manual play events to update now playing and prevent multiple playing
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#songList audio').forEach(audio => {
+        audio.addEventListener('play', function() {
+            pauseAllExcept(audio);
+            const li = audio.closest('li');
+            if (li) {
+                const songName = li.childNodes[0].textContent.trim();
+                setNowPlaying(songName);
+            }
+        });
+        audio.addEventListener('pause', function() {
+            // Optionally clear now playing on pause
+            // setNowPlaying('');
+        });
+        audio.addEventListener('ended', function() {
+            setNowPlaying('');
+        });
+    });
+});
+
+// Toggle between perf and rehers directories
+function toggleDirectory() {
+    const useRehearsal = document.getElementById('toggleDir').checked;
+    const audios = document.querySelectorAll('#songList audio');
+    audios.forEach(audio => {
+        let src = audio.getAttribute('src');
+        if (useRehearsal) {
+            // Change 'perf/' to 'rehers/' if not already
+            if (src.startsWith('perf/')) {
+                audio.setAttribute('src', src.replace('perf/', 'rehers/'));
+            }
+        } else {
+            // Change 'rehers/' back to 'perf/'
+            if (src.startsWith('rehers/')) {
+                audio.setAttribute('src', src.replace('rehers/', 'perf/'));
+            }
+        }
+    });
+}
     </script>
 </body>
 </html>
