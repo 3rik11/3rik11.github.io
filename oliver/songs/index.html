@@ -108,6 +108,10 @@
         <label for="autoplayCount">How many songs to autoplay?</label>
         <input type="number" id="autoplayCount" min="1" max="39" value="3" style="width:3em;">
         <button onclick="autoplaySongs()">Autoplay</button>
+        <label style="margin-left:1em;">
+            <input type="checkbox" id="autoplayFromLast" checked>
+            Autoplay from last played
+        </label>
     </div>
 
     <div style="text-align:center; margin-bottom:1em;">
@@ -242,6 +246,9 @@
     <p>For more information and resources, visit the <a href="index.html">main page</a>.</p>
 
     <script>
+let lastPlayedIndex = 0;
+
+// Filter songs
 function filterSongs() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
@@ -276,18 +283,23 @@ function pauseAllExcept(currentAudio) {
     });
 }
 
-// Autoplay logic
+// Autoplay logic with toggle
 function autoplaySongs() {
     const count = parseInt(document.getElementById('autoplayCount').value, 10);
+    const fromLast = document.getElementById('autoplayFromLast').checked;
     const lis = Array.from(document.querySelectorAll('#songList li')).filter(li => li.style.display !== 'none');
     if (lis.length === 0) return;
 
     // Pause all audios first
     document.querySelectorAll('#songList audio').forEach(a => { a.pause(); a.currentTime = 0; });
 
-    let current = 0;
+    let startIdx = fromLast ? lastPlayedIndex : 0;
+    if (startIdx < 0 || startIdx >= lis.length) startIdx = 0;
+    let current = startIdx;
+    let played = 0;
+
     function playNext() {
-        if (current >= Math.min(count, lis.length)) {
+        if (played >= count || current >= lis.length) {
             setNowPlaying('');
             return;
         }
@@ -299,6 +311,7 @@ function autoplaySongs() {
             audio.play();
             audio.onended = function() {
                 current++;
+                played++;
                 playNext();
             };
         } else {
@@ -318,6 +331,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const songName = li.childNodes[0].textContent.trim();
                 setNowPlaying(songName);
             }
+            // Update lastPlayedIndex to the index of the played audio (among visible lis)
+            const visibleLis = Array.from(document.querySelectorAll('#songList li')).filter(li => li.style.display !== 'none');
+            lastPlayedIndex = visibleLis.indexOf(audio.closest('li'));
+            if (lastPlayedIndex < 0) lastPlayedIndex = 0;
         });
         audio.addEventListener('pause', function() {
             // Optionally clear now playing on pause
